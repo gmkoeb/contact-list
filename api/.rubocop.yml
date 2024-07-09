@@ -25,3 +25,8 @@ Metrics/BlockLength:
 Metrics/AbcSize:
   Exclude:
   - 'app/controllers/users/*'
+  - 'app/controllers/application_controller.rb'
+
+Metrics/MethodLength:
+  Exclude:
+  - 'app/controllers/application_controller.rb'

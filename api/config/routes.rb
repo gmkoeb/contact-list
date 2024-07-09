@@ -8,4 +8,6 @@ Rails.application.routes.draw do
     sessions: 'users/sessions',
     registrations: 'users/registrations'
   }
+
+  get 'check_session', to: 'check_session#check'
 end
