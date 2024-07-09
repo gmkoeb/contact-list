@@ -21,5 +21,7 @@ Style/FrozenStringLiteralComment:
 
 Metrics/BlockLength:
   AllowedMethods: ['describe', 'context', 'feature', 'scenario', 'let', 'it']
+
+Metrics/AbcSize:
   Exclude:
-    - 'spec/factories/**/*'
+  - 'app/controllers/users/*'
