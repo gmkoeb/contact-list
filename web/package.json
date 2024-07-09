@@ -12,7 +12,9 @@
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1",
     "axios": "^1.7.2",
+    "formik": "^2.4.6",
     "js-cookie": "^3.0.5"
   },
   "devDependencies": {
