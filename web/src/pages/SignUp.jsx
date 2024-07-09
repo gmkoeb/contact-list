@@ -1,12 +1,11 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Formik, Form } from 'formik'
 import TextInput from '../components/TextInput'
-import { useNavigate } from 'react-router-dom'
 import { api } from '../../api/axios'
 
 export default function SignUp() {
   const [error, setError] = useState('')
-  const navigate = useNavigate()
+
   return (
     <Formik
       onSubmit={(values, { setSubmitting }) => {
@@ -19,7 +18,6 @@ export default function SignUp() {
         }
         api.post('/signup', userData)
           .then(() => {
-            navigate('/sign_in')
             setSubmitting(false);
           })
           .catch(error => {
@@ -30,8 +28,8 @@ export default function SignUp() {
       initialValues={{ name: "", email: "", password: "", confirm_password: "" }}
       validate={(values) => {
         const errors = {};
-        if (!values.username) {
-          errors.username = "Required"
+        if (!values.name) {
+          errors.name = "Required"
         }
 
         if (!values.password) {
@@ -66,7 +64,7 @@ export default function SignUp() {
           <button className="mt-6 bg-purple-600 text-white rounded-lg py-1 font-semibold hover:bg-opacity-75 hover:duration-300 w-[75%]" type="submit" disabled={isSubmitting}>
             Sign Up
           </button>
-          <p className='text-red-600 text-center'>{error}</p>
+          <p className='text-red-600 text-center px-2'>{error}</p>
         </Form>
       )}
     </Formik>
