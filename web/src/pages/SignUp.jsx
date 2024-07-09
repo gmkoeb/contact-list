@@ -57,7 +57,7 @@ export default function SignUp() {
         <Form
           className="flex flex-col w-96 mx-auto border border-gray-800 bg-white rounded-md mt-10 items-center py-10 text-left gap-3">
 
-          <h1 className='text-center text-2xl mb-4'>Sign Up</h1>
+          <h1 className='text-center text-2xl mb-4'>Create your account</h1>
 
           <TextInput label="Name" name="name" type="text" placeholder="Enter your name" />
           <TextInput label="Email" name="email" type="email" placeholder="Enter your email address" />

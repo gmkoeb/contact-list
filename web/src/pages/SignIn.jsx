@@ -2,13 +2,13 @@ import { Form, Formik } from "formik";
 import TextInput from "../components/TextInput";
 import { api } from "../../api/axios";
 import Cookies from 'js-cookie'
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 export default function SignIn(){
   const navigate = useNavigate()
   const [error, setError] = useState('')
-  
+
   async function handleSubmit(values, { setSubmitting }){
     const userData = {
       user: {
@@ -56,6 +56,7 @@ export default function SignIn(){
           <TextInput label="Password" name="password" type="password" placeholder="Enter your password" />
           <button className="mt-6 bg-purple-600 text-white rounded-lg py-1 font-semibold hover:bg-opacity-75 hover:duration-300 w-72" type="submit" disabled={isSubmitting}>Login</button>
           <p className="text-red-600 text-lg mt-4">{error}</p>
+          <Link to={'/sign_up'} className="text-blue-600 mt-2 hover:bg-gray-200 rounded-md px-3 duration-300">Don't have an account? Sign up here</Link>
         </Form>
         )}
       </Formik>

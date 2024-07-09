@@ -22,7 +22,7 @@ export default function Header(){
 
   return(
     <header className="mb-20">
-      <nav className="flex justify-between items-center p-5 bg-slate-200">
+      <nav className="flex justify-between items-center p-3 bg-white shadow-sm">
         <div>
           <NavLink className={'text-3xl font-bold text-purple-600 mx-4'} to={'/'}>Contacts List</NavLink>
         </div>
