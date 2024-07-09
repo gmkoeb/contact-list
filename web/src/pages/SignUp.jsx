@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { Formik, Form } from 'formik'
 import TextInput from '../components/TextInput'
 import { api } from '../../api/axios'
+import { useNavigate } from 'react-router-dom'
 
 export default function SignUp() {
   const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   return (
     <Formik
@@ -19,6 +21,7 @@ export default function SignUp() {
         api.post('/signup', userData)
           .then(() => {
             setSubmitting(false);
+            navigate('/sign_in');
           })
           .catch(error => {
             setError(error.response.data.status["message"]);
