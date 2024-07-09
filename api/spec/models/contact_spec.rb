@@ -92,7 +92,7 @@ RSpec.describe Contact, type: :model do
         contact = user.contacts.create(name: 'Test', registration_number: '30830071083', phone: '123456',
                                        address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
         expect(contact).not_to be_valid
-        expect(contact.errors['registration_number']).to include 'Registration number already registered for this user'
+        expect(contact.errors['registration_number']).to include 'already exists for this user'
       end
     end
   end
