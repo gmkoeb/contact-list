@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import Cookies from 'js-cookie'
 import { checkSession } from "../lib/checkSession"
 import { Link } from "react-router-dom"
-import { Plus, X } from "lucide-react"
+import { UserRoundPlus } from "lucide-react"
 import { Form, Formik } from "formik";
 import TextInput from "../components/TextInput"
 import { api } from "../../api/axios"
@@ -12,6 +12,7 @@ export default function Home(){
   const [formOpen, setFormOpen] = useState(false)
   const [contacts, setContacts] = useState([])
   const [apiErrors, setApiErrors] = useState([])
+  const [contactDetails, setContactDetails] = useState(false)
 
   async function handleSubmit(values, { setSubmitting }){
     const contactData = {
@@ -27,39 +28,79 @@ export default function Home(){
     }
 
     try {
-      const response = await api.post('/contacts', contactData)
+      await api.post('/contacts', contactData)
       setSubmitting(false)
+      getContacts()
+      setFormOpen(false)
     } catch (error) {
       setApiErrors(error.response.data.message)
       setSubmitting(false)
     }
   }
 
+  async function getContacts(){
+    const response = await api.get('/contacts')
+    setContacts(response.data.contacts)
+  }
+
   useEffect(() =>{
     if (Cookies.get('token')) {
       checkSession(setIsLoggedIn)
+      getContacts()
     }
   }, [])
 
   return(
     <>
       {isLoggedIn ? (
-        <div>
+        <div className="relative">
           {contacts.length === 0 ? (
-            <div className="text-center">
+            <div className="text-center flex flex-col items-center">
               <h2 className="text-xl">Your contact list is empty</h2>
-              <button onClick={() => setFormOpen(true)} className="flex mx-auto gap-2 text-lg items-center bg-purple-600 text-white rounded-lg mt-3 px-4 py-1 hover:opacity-80 duration-200">Add a contact <Plus /></button>
+              <button onClick={() => setFormOpen(true)} 
+                      className="flex gap-2 text-lg items-center bg-purple-600 text-white rounded-lg mt-3 px-4 py-1 hover:opacity-80 duration-200 w-46">
+                Add a contact<UserRoundPlus width={20} height={24}/>
+              </button>
             </div>
           ): (
-            <>
-              <div className="text-center">
-                <h2 className="text-xl">My contacts</h2>
-                <button onClick={() => setFormOpen(true)} className="flex mx-auto gap-2 text-lg items-center bg-purple-600 text-white rounded-lg mt-3 px-4 py-1 hover:opacity-80 duration-200">Add a contact <Plus /></button>
+            <div>
+              <div className="flex flex-col justify-center items-center">
+                <h2 className="text-3xl mx-5">My contacts</h2>
               </div>
-            </>
+              <div className="w-1/2 mx-auto flex">
+                <button
+                  onClick={() => setFormOpen(true)}
+                  className="flex gap-2 text-lg items-center bg-purple-600 text-white rounded-lg px-4 py-1 mt-4 mr-4 hover:opacity-80 duration-200 border border-gray-600"
+                >
+                  Add <UserRoundPlus width={20} height={24} />
+                </button>
+              </div>
+              <table className="w-1/2 mx-auto mt-4">
+                <thead className="rounded-t-3xl bg-gray-200">
+                  <tr className="text-gray-600">
+                    <th className="py-2">Name</th>
+                    <th>Registration Number</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>Zip Code</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {contacts.map(contact => (
+                    <tr key={contact.id}>
+                      <td>{contact.name}</td>
+                      <td>{contact.registration_number}</td>
+                      <td>{contact.phone}</td>
+                      <td>{contact.address}</td>
+                      <td>{contact.zip_code}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
           {formOpen && (
-            <>
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
               <Formik
                 onSubmit={handleSubmit}
                 initialValues={{ name: "", registration_number: "", phone: "", address: "", zip_code: "", latitude: 0, longitude: 0}}
@@ -95,7 +136,7 @@ export default function Home(){
                   return errors
                 }}>
                   {({ isSubmitting }) => (
-                    <Form className="flex flex-col w-[50vw] -translate-x-1/2 right-1/2 left-1/2 border border-gray-800 bg-white rounded-md mt-10 items-center py-10 text-left gap-3 absolute">
+                    <Form className="flex flex-col w-1/2 border border-gray-800 bg-white rounded-md items-center py-10 text-left gap-3">
                       <h1 className='text-center text-2xl mb-4'>Add contact</h1>
                       <div className="flex flex-wrap gap-5 justify-center">
                         <TextInput label="Name" name="name" type="name" placeholder="Contact name" />
@@ -112,7 +153,7 @@ export default function Home(){
                     </Form>
                 )}
               </Formik>
-            </>
+            </div>
           )}
         </div>
       ) : (

@@ -1,7 +1,9 @@
 class ContactsController < ApplicationController
   before_action :authenticate_user
 
-  def index; end
+  def index
+    render status: :ok, json: { contacts: @current_user.contacts }
+  end
 
   def create
     contact_params = params.require(:contact).permit(:name, :registration_number, :phone, :address,
