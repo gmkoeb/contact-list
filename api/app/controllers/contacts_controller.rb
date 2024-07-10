@@ -1,5 +1,8 @@
 class ContactsController < ApplicationController
   before_action :authenticate_user
+
+  def index; end
+
   def create
     contact_params = params.require(:contact).permit(:name, :registration_number, :phone, :address,
                                                      :zip_code, :latitude, :longitude)

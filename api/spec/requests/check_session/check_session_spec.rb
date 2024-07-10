@@ -1,13 +1,11 @@
 describe 'Check Session' do
   context 'GET /check_session' do
     it 'returns success if headers are valid' do
-      User.create(name: 'Test', email: 'test@email.com', password: '123456')
-
-      post user_session_path, params: { user: { email: 'test@email.com', password: '123456' } }
-      json_response = JSON.parse(response.body)
-      token = json_response['status']['data']['Authorization']['token']
+      user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
+      token = login(user)
 
       get '/check_session', headers: { Authorization: token }
+
       expect(JSON.parse(response.body)['session']).to eq 'Authorized'
     end
 
