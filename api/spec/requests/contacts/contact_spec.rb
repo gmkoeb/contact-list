@@ -96,4 +96,56 @@ describe 'Contact API' do
       expect(json_response['message']).to eq "Couldn't find an active session."
     end
   end
+
+  context 'DELETE /contacts/:id' do
+    it 'deletes a specific contact with success' do
+      user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
+     
+      user.contacts.create(name: 'Contact 1', registration_number: '30830071083', phone: '123456',
+                           address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+
+      token = login(user)
+      delete contact_path(1), headers: { Authorization: token }
+      json_response = JSON.parse(response.body)
+
+      expect(response.status).to eq 200
+      expect(user.contacts.length).to eq 0
+      expect(Contact.last).to be_nil
+      expect(json_response['message']).to eq 'Contact deleted with success.'
+    end
+
+    it 'a user cant delete another user contact' do
+      user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
+      second_user = User.create(name: 'Test 2', email: 'test2@email.com', password: '123456')
+      user.contacts.create(name: 'Contact 1', registration_number: '30830071083', phone: '123456',
+                           address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+      user.contacts.create(name: 'Contact 2', registration_number: '71005272018', phone: '123456',
+                           address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+      second_user.contacts.create(name: 'Contact 3', registration_number: '30830071083', phone: '123456',
+                                  address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+
+      token = login(user)
+      delete contact_path(second_user.contacts.first), headers: { Authorization: token }
+      json_response = JSON.parse(response.body)
+
+      expect(response.status).to eq 401
+      expect(json_response['message']).to eq 'Permission denied.'
+      expect(second_user.contacts.length).to eq 1
+      expect(second_user.contacts.first).not_to be nil
+    end
+
+    it 'a user must be authenticated to delete a contact' do
+      user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
+      contact = user.contacts.create(name: 'Contact 1', registration_number: '30830071083', phone: '123456',
+                                     address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+
+      delete contact_path(1)
+      json_response = JSON.parse(response.body)
+
+      expect(response.status).to eq 401
+      expect(json_response['message']).to eq "Couldn't find an active session."
+      expect(Contact.all.count).to eq 1
+      expect(Contact.last).to eq contact
+    end
+  end
 end

@@ -15,4 +15,15 @@ class ContactsController < ApplicationController
       render status: :unprocessable_content, json: { message: contact.errors.full_messages }
     end
   end
+  
+  def destroy
+    contact = Contact.find(params[:id])
+
+    if contact.user == @current_user
+      contact.delete
+      render status: :ok, json: { message: 'Contact deleted with success.' }
+    else
+      render status: :unauthorized, json: { message: "Permission denied." }
+    end
+  end
 end

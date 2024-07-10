@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import Cookies from 'js-cookie'
 import { checkSession } from "../lib/checkSession"
 import { Link } from "react-router-dom"
-import { UserRoundPlus } from "lucide-react"
+import { Trash2, UserRoundPlus } from "lucide-react"
 import { Form, Formik } from "formik";
 import TextInput from "../components/TextInput"
 import { api } from "../../api/axios"
@@ -43,6 +43,11 @@ export default function Home(){
     setContacts(response.data.contacts)
   }
 
+  async function handleDelete(id){
+    await api.delete(`/contacts/${id}`)
+    getContacts()
+  }
+
   useEffect(() =>{
     if (Cookies.get('token')) {
       checkSession(setIsLoggedIn)
@@ -65,7 +70,7 @@ export default function Home(){
           ): (
             <div>
               <div className="flex flex-col justify-center items-center">
-                <h2 className="text-3xl mx-5">My contacts</h2>
+                <h2 className="text-3xl text-left w-1/2 font-bold text-gray-500">Contacts</h2>
               </div>
               <div className="w-1/2 mx-auto flex">
                 <button
@@ -93,6 +98,7 @@ export default function Home(){
                       <td>{contact.phone}</td>
                       <td>{contact.address}</td>
                       <td>{contact.zip_code}</td>
+                      <td><Trash2 onClick={() => handleDelete(contact.id)} color="#dc2626" height={24} width={20} className="cursor-pointer"/></td>
                     </tr>
                   ))}
                 </tbody>
