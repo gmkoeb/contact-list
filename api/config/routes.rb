@@ -10,4 +10,5 @@ Rails.application.routes.draw do
   }
 
   get 'check_session', to: 'check_session#check'
+  resources :contacts
 end

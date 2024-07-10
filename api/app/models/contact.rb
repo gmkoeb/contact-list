@@ -8,6 +8,6 @@ class Contact < ApplicationRecord
   private
 
   def valid_registration_number
-    errors.add(:registration_number, 'Registration number not valid') unless CPF.valid?(registration_number)
+    errors.add(:registration_number, 'not valid') unless CPF.valid?(registration_number)
   end
 end

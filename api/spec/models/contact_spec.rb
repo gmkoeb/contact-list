@@ -82,7 +82,7 @@ RSpec.describe Contact, type: :model do
                                       address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
 
         expect(contact).not_to be_valid
-        expect(contact.errors['registration_number']).to include 'Registration number not valid'
+        expect(contact.errors['registration_number']).to include 'not valid'
       end
 
       it 'must be unique for each user' do
