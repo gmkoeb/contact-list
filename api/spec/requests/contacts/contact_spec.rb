@@ -100,7 +100,7 @@ describe 'Contact API' do
   context 'DELETE /contacts/:id' do
     it 'deletes a specific contact with success' do
       user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
-     
+
       user.contacts.create(name: 'Contact 1', registration_number: '30830071083', phone: '123456',
                            address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
 
@@ -146,6 +146,107 @@ describe 'Contact API' do
       expect(json_response['message']).to eq "Couldn't find an active session."
       expect(Contact.all.count).to eq 1
       expect(Contact.last).to eq contact
+    end
+  end
+
+  context 'PATCH /contacts/:id' do
+    it 'updates a specific contact with success' do
+      user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
+
+      user.contacts.create(name: 'Contact 1', registration_number: '30830071083', phone: '123456',
+                           address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+
+      token = login(user)
+      patch contact_path(1), headers: { Authorization: token }, params: { contact: { name: 'New Name' } }
+      json_response = JSON.parse(response.body)
+
+      expect(response.status).to eq 200
+      expect(user.contacts.last.name).to eq 'New Name'
+      expect(json_response['message']).to eq 'Contact updated with success.'
+    end
+
+    it 'a user cannot update another user contact' do
+      user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
+      second_user = User.create(name: 'Test 2', email: 'test2@email.com', password: '123456')
+      user.contacts.create(name: 'Contact 1', registration_number: '30830071083', phone: '123456',
+                           address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+      user.contacts.create(name: 'Contact 2', registration_number: '71005272018', phone: '123456',
+                           address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+      second_user.contacts.create(name: 'Contact 3', registration_number: '30830071083', phone: '123456',
+                                  address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+
+      token = login(user)
+      patch contact_path(second_user.contacts.first), headers: { Authorization: token },
+                                                      params: { contact: { name: 'New Name' } }
+      json_response = JSON.parse(response.body)
+
+      expect(response.status).to eq 401
+      expect(json_response['message']).to eq 'Permission denied.'
+      expect(second_user.contacts.first.name).to eq 'Contact 3'
+    end
+
+    it 'a user must be authenticated to update a contact' do
+      user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
+      user.contacts.create(name: 'Contact 1', registration_number: '30830071083', phone: '123456',
+                           address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+
+      patch contact_path(1), params: { contact: { name: 'New Name' } }
+      json_response = JSON.parse(response.body)
+
+      expect(response.status).to eq 401
+      expect(json_response['message']).to eq "Couldn't find an active session."
+    end
+  end
+
+  context 'GET /contacts/id' do
+    it 'retrieves a specific contact based on id' do
+      user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
+
+      user.contacts.create(name: 'Contact 1', registration_number: '30830071083', phone: '123456',
+                           address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+
+      token = login(user)
+      get contact_path(1), headers: { Authorization: token }
+      json_response = JSON.parse(response.body)
+
+      expect(response.status).to eq 200
+      expect(json_response['contact']['name']).to eq 'Contact 1'
+      expect(json_response['contact']['registration_number']).to eq '30830071083'
+      expect(json_response['contact']['phone']).to eq '123456'
+      expect(json_response['contact']['address']).to eq 'Test street, 155'
+      expect(json_response['contact']['zip_code']).to eq '123456'
+      expect(json_response['contact']['latitude']).to eq 123
+      expect(json_response['contact']['longitude']).to eq 123
+    end
+
+    it 'user cant see contacts from other users' do
+      user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
+      second_user = User.create(name: 'Test 2', email: 'test2@email.com', password: '123456')
+      user.contacts.create(name: 'Contact 1', registration_number: '30830071083', phone: '123456',
+                           address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+      user.contacts.create(name: 'Contact 2', registration_number: '71005272018', phone: '123456',
+                           address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+      second_user.contacts.create(name: 'Contact 3', registration_number: '30830071083', phone: '123456',
+                                  address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+
+      token = login(user)
+      get contact_path(second_user.contacts.first), headers: { Authorization: token }
+      json_response = JSON.parse(response.body)
+
+      expect(response.status).to eq 401
+      expect(json_response['message']).to eq 'Permission denied.'
+    end
+
+    it 'user must be authenticated to fetch a specific contact' do
+      user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
+      user.contacts.create(name: 'Contact 1', registration_number: '30830071083', phone: '123456',
+                           address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+
+      get contact_path(1)
+      json_response = JSON.parse(response.body)
+
+      expect(response.status).to eq 401
+      expect(json_response['message']).to eq "Couldn't find an active session."
     end
   end
 end

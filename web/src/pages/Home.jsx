@@ -2,19 +2,20 @@ import { useEffect, useState } from "react"
 import Cookies from 'js-cookie'
 import { checkSession } from "../lib/checkSession"
 import { Link } from "react-router-dom"
-import { Trash2, UserRoundPlus } from "lucide-react"
+import { Pencil, Trash2, UserRoundPlus } from "lucide-react"
 import { Form, Formik } from "formik";
 import TextInput from "../components/TextInput"
 import { api } from "../../api/axios"
 
 export default function Home(){
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [formOpen, setFormOpen] = useState(false)
+  const [createFormOpen, setCreateFormOpen] = useState(false)
+  const [updateFormOpen, setUpdateFormOpen] = useState(false)
   const [contacts, setContacts] = useState([])
   const [apiErrors, setApiErrors] = useState([])
-  const [contactDetails, setContactDetails] = useState(false)
+  const [contact, setContact] = useState(null)
 
-  async function handleSubmit(values, { setSubmitting }){
+  async function handleContactCreation(values, { setSubmitting }){
     const contactData = {
       contact: {
         name: values.name,
@@ -31,13 +32,38 @@ export default function Home(){
       await api.post('/contacts', contactData)
       setSubmitting(false)
       getContacts()
-      setFormOpen(false)
+      setCreateFormOpen(false)
     } catch (error) {
       setApiErrors(error.response.data.message)
       setSubmitting(false)
     }
   }
 
+  async function handleContactUpdate(values, { setSubmitting }){
+    const contactData = {
+      contact: {
+        name: values.name,
+        registration_number: values.registration_number,
+        phone: values.phone,
+        address: values.address,
+        zip_code: values.zip_code,
+        latitude: values.latitude,
+        longitude: values.longitude
+      }
+    }
+
+    try {
+      await api.patch(`/contacts/${contact.id}`, contactData)
+      setSubmitting(false)
+      getContacts()
+      setContact(null)
+      setCreateFormOpen(false)
+    } catch (error) {
+      setApiErrors(error.response.data.message)
+      setSubmitting(false)
+    }
+  }
+  
   async function getContacts(){
     const response = await api.get('/contacts')
     setContacts(response.data.contacts)
@@ -46,6 +72,17 @@ export default function Home(){
   async function handleDelete(id){
     await api.delete(`/contacts/${id}`)
     getContacts()
+  }
+
+  async function handleOpenUpdateForm(id){
+    setUpdateFormOpen(true)
+    const response = await api.get(`/contacts/${id}`)
+    setContact(response.data.contact)
+  }
+
+  function handleCloseUpdateForm(){
+    setUpdateFormOpen(false)
+    setContact(null)
   }
 
   useEffect(() =>{
@@ -74,7 +111,7 @@ export default function Home(){
               </div>
               <div className="w-1/2 mx-auto flex">
                 <button
-                  onClick={() => setFormOpen(true)}
+                  onClick={() => setCreateFormOpen(true)}
                   className="flex gap-2 text-lg items-center bg-purple-600 text-white rounded-lg px-4 py-1 mt-4 mr-4 hover:opacity-80 duration-200 border border-gray-600"
                 >
                   Add <UserRoundPlus width={20} height={24} />
@@ -88,6 +125,8 @@ export default function Home(){
                     <th>Phone</th>
                     <th>Address</th>
                     <th>Zip Code</th>
+                    <th></th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -98,17 +137,19 @@ export default function Home(){
                       <td>{contact.phone}</td>
                       <td>{contact.address}</td>
                       <td>{contact.zip_code}</td>
-                      <td><Trash2 onClick={() => handleDelete(contact.id)} color="#dc2626" height={24} width={20} className="cursor-pointer"/></td>
+                      <td><Pencil onClick={() => handleOpenUpdateForm(contact.id)} height={24} width={20} className="cursor-pointer"/></td>
+                      <td><Trash2 onClick={() => handleDelete(contact.id)} height={24} width={20} className="cursor-pointer"/></td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           )}
-          {formOpen && (
+
+          {createFormOpen && (
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
               <Formik
-                onSubmit={handleSubmit}
+                onSubmit={handleContactCreation}
                 initialValues={{ name: "", registration_number: "", phone: "", address: "", zip_code: "", latitude: 0, longitude: 0}}
                 validate={(values) => {
                   const errors = {};
@@ -154,7 +195,66 @@ export default function Home(){
                         <TextInput label="Longitude" name="longitude" type="longitude" placeholder="Contact longitude" />
                       </div>
                       <button className="mt-6 bg-purple-600 text-white rounded-lg py-1 font-semibold hover:bg-opacity-75 hover:duration-300 w-72" type="submit" disabled={isSubmitting}>Add contact</button>
-                      <button onClick={() => setFormOpen(false)} className="bg-red-600 w-40 text-white rounded-lg py-1 hover:bg-opacity-75 hover:duration-300">Cancel</button>
+                      <button onClick={() => setCreateFormOpen(false)} className="bg-red-600 w-40 text-white rounded-lg py-1 hover:bg-opacity-75 hover:duration-300">Cancel</button>
+                      <p className="text-red-600 text-lg mt-4">{apiErrors}</p>
+                    </Form>
+                )}
+              </Formik>
+            </div>
+          )}
+
+          {updateFormOpen && contact && (
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+              <Formik
+                onSubmit={handleContactUpdate}
+                initialValues={{ name: contact.name, registration_number: contact.registration_number, 
+                                 phone: contact.phone, address: contact.address, zip_code: contact.zip_code, 
+                                 latitude: contact.latitude, longitude: contact.longitude}}
+                validate={(values) => {
+                  const errors = {};
+                  if (!values.name) {
+                    errors.name = "Required"
+                  }
+
+                  if (!values.registration_number) {
+                    errors.registration_number = 'Required';
+                  } 
+
+                  if(!values.phone){
+                    errors.phone = 'Required'
+                  }
+
+                  if(!values.address){
+                    errors.address = 'Required'
+                  }
+
+                  if(!values.zip_code){
+                    errors.zip_code = 'Required'
+                  }
+
+                  if(!values.latitude){
+                    errors.latitude = 'Required'
+                  }
+
+                  if(!values.longitude){
+                    errors.longitude = 'Required'
+                  }
+                  return errors
+                }}>
+                  {({ isSubmitting }) => (
+                    <Form className="flex flex-col w-1/2 border border-gray-800 bg-white rounded-md items-center py-10 text-left gap-3">
+                      <h1 className='text-center text-2xl mb-4'>Add contact</h1>
+                      <div className="flex flex-wrap gap-5 justify-center">
+                        <TextInput label="Name" name="name" type="name" placeholder="Contact name" />
+                        <TextInput label="Registration Number" name="registration_number" type="registration_number" placeholder="Contact registration number" />
+                        <TextInput label="Phone" name="phone" type="phone" placeholder="Contact phone" />
+                        <TextInput label="Address" name="address" type="address" placeholder="Contact address" />
+                        <TextInput label="Zip code" name="zip_code" type="zip_code" placeholder="Contact zip code" />
+                        <TextInput label="Latitude" name="latitude" type="latitude" placeholder="Contact latitude" />
+                        <TextInput label="Longitude" name="longitude" type="longitude" placeholder="Contact longitude" />
+                      </div>
+                      <button className="mt-6 bg-purple-600 text-white rounded-lg py-1 font-semibold hover:bg-opacity-75 hover:duration-300 w-72" type="submit" disabled={isSubmitting}>Update</button>
+                      <button onClick={() => handleCloseUpdateForm()} className="bg-red-600 w-40 text-white rounded-lg py-1 hover:bg-opacity-75 hover:duration-300">Cancel</button>
                       <p className="text-red-600 text-lg mt-4">{apiErrors}</p>
                     </Form>
                 )}
