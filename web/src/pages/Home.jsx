@@ -1,14 +1,34 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, React } from "react"
 import Cookies from 'js-cookie'
 import { checkSession } from "../lib/checkSession"
 import { Link } from "react-router-dom"
-import { HelpCircle, Pencil, Trash2, User, UserRoundPlus } from "lucide-react"
+import { HelpCircle, Pencil, Trash2, UserRoundPlus } from "lucide-react"
 import { Form, Formik } from "formik";
 import TextInput from "../components/TextInput"
 import { api } from "../../api/axios"
 import { Tooltip } from 'react-tooltip'
+import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
+
+
+const mapContainerStyle = {
+  width: '25vw',
+  height: '50vh',
+}
+
+const center = {
+  lat: -25.4284,
+  lng: -49,
+}
 
 export default function Home(){
+  const { loadError } = useLoadScript({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_API_KEY,
+  })
+
+  if (loadError) {
+    return <div>Error loading maps</div>;
+  }
+
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [createFormOpen, setCreateFormOpen] = useState(false)
   const [updateFormOpen, setUpdateFormOpen] = useState(false)
@@ -112,6 +132,11 @@ export default function Home(){
     }
   }
 
+  async function handleContactClick(id){
+    const response = await api.get(`/contacts/${id}`)
+    setContact(response.data.contact)
+  }
+
   useEffect(() =>{
     if (Cookies.get('token')) {
       checkSession(setIsLoggedIn)
@@ -131,9 +156,11 @@ export default function Home(){
   useEffect(() => {
     setSuggestions([])
   }, [helperFormOpen])
+
   useEffect(() => {
     setSuggestion({address: '', zip_code: ''})
   }, [createFormOpen])
+
   useEffect(() => {
     setContact(null)
   }, [updateFormOpen])
@@ -151,7 +178,7 @@ export default function Home(){
               </button>
             </div>
           ): (
-            <div>
+            <div className="w-[85%]">
               <div className="flex flex-col justify-center items-center">
                 <h2 className="text-3xl text-left w-1/2 font-bold text-gray-500">Contacts</h2>
               </div>
@@ -185,7 +212,7 @@ export default function Home(){
                   </thead>
                   <tbody>
                     {contacts.map(contact => (
-                      <tr key={contact.id}>
+                      <tr onClick={() => handleContactClick(contact.id)} className="cursor-pointer" key={contact.id}>
                         <td>{contact.name}</td>
                         <td>{contact.registration_number}</td>
                         <td>{contact.phone}</td>
@@ -198,6 +225,16 @@ export default function Home(){
                   </tbody>
                 </table>
               }
+                <div className="fixed right-[11%] top-[26%]">
+                  <GoogleMap
+                    id="map"
+                    mapContainerStyle={mapContainerStyle}
+                    zoom={10}
+                    center={center}
+                  >
+                    <MarkerF position={{lat: contact?.latitude, lng: contact?.longitude}} />
+                  </GoogleMap>
+                </div>
             </div>
           )}
 

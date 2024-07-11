@@ -30,3 +30,8 @@ th:first-of-type {
 th:last-of-type {
   border-top-right-radius: 10px;
 }
+
+#map{
+  border-radius: 10px;
+  border: 1px solid;
+}
