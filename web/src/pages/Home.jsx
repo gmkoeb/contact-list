@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import Cookies from 'js-cookie'
 import { checkSession } from "../lib/checkSession"
 import { Link } from "react-router-dom"
-import { Pencil, Trash2, UserRoundPlus } from "lucide-react"
+import { Pencil, Trash2, User, UserRoundPlus } from "lucide-react"
 import { Form, Formik } from "formik";
 import TextInput from "../components/TextInput"
 import { api } from "../../api/axios"
@@ -14,6 +14,8 @@ export default function Home(){
   const [contacts, setContacts] = useState([])
   const [apiErrors, setApiErrors] = useState([])
   const [contact, setContact] = useState(null)
+  const [filteredContacts, setFilteredContacts] = useState([])
+  const [searchQuery, setSearchQuery] = useState('')
 
   async function handleContactCreation(values, { setSubmitting }){
     const contactData = {
@@ -67,6 +69,7 @@ export default function Home(){
   async function getContacts(){
     const response = await api.get('/contacts')
     setContacts(response.data.contacts)
+    setFilteredContacts(response.data.contacts)
   }
 
   async function handleDelete(id){
@@ -92,14 +95,22 @@ export default function Home(){
     }
   }, [])
 
+  useEffect(() => {
+    setContacts(() => 
+      filteredContacts.filter(contact => 
+        contact.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        contact.registration_number.includes(searchQuery)
+      )
+    )
+  }, [searchQuery, filteredContacts])
   return(
     <>
       {isLoggedIn ? (
         <div className="relative">
-          {contacts.length === 0 ? (
+          {contacts.length === 0 && !searchQuery ? (
             <div className="text-center flex flex-col items-center">
               <h2 className="text-xl">Your contact list is empty</h2>
-              <button onClick={() => setFormOpen(true)} 
+              <button onClick={() => setCreateFormOpen(true)} 
                       className="flex gap-2 text-lg items-center bg-purple-600 text-white rounded-lg mt-3 px-4 py-1 hover:opacity-80 duration-200 w-46">
                 Add a contact<UserRoundPlus width={20} height={24}/>
               </button>
@@ -109,40 +120,49 @@ export default function Home(){
               <div className="flex flex-col justify-center items-center">
                 <h2 className="text-3xl text-left w-1/2 font-bold text-gray-500">Contacts</h2>
               </div>
-              <div className="w-1/2 mx-auto flex">
+              <div className="w-1/2 mx-auto flex items-center mt-4">
                 <button
                   onClick={() => setCreateFormOpen(true)}
-                  className="flex gap-2 text-lg items-center bg-purple-600 text-white rounded-lg px-4 py-1 mt-4 mr-4 hover:opacity-80 duration-200 border border-gray-600"
+                  className="flex gap-2 text-lg items-center bg-purple-600 text-white rounded-lg px-4 py-1 mr-4 hover:opacity-80 duration-200 border border-gray-600"
                 >
                   Add <UserRoundPlus width={20} height={24} />
                 </button>
+                <div className="flex flex-col">
+                  <label className="hidden" htmlFor='contactSearch'>Search</label>
+                  <input className="py-1 pl-2 w-64 border-2 rounded-lg" type="text" placeholder="Search for a contact" onChange={(event) => setSearchQuery(event.target.value)} />
+                </div>
               </div>
-              <table className="w-1/2 mx-auto mt-4">
-                <thead className="rounded-t-3xl bg-gray-200">
-                  <tr className="text-gray-600">
-                    <th className="py-2">Name</th>
-                    <th>Registration Number</th>
-                    <th>Phone</th>
-                    <th>Address</th>
-                    <th>Zip Code</th>
-                    <th></th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {contacts.map(contact => (
-                    <tr key={contact.id}>
-                      <td>{contact.name}</td>
-                      <td>{contact.registration_number}</td>
-                      <td>{contact.phone}</td>
-                      <td>{contact.address}</td>
-                      <td>{contact.zip_code}</td>
-                      <td><Pencil onClick={() => handleOpenUpdateForm(contact.id)} height={24} width={20} className="cursor-pointer"/></td>
-                      <td><Trash2 onClick={() => handleDelete(contact.id)} height={24} width={20} className="cursor-pointer"/></td>
+                {searchQuery &&
+                  <p className="text-center">Found {contacts.length} {contacts.length === 1 ? 'result' : 'results'} for: "{searchQuery}"</p>
+                }
+              {contacts.length > 0 &&
+                <table className="w-1/2 mx-auto mt-4">
+                  <thead className="rounded-t-3xl bg-gray-200">
+                    <tr className="text-gray-600">
+                      <th className="py-2">Name</th>
+                      <th>Registration Number</th>
+                      <th>Phone</th>
+                      <th>Address</th>
+                      <th>Zip Code</th>
+                      <th></th>
+                      <th></th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {contacts.map(contact => (
+                      <tr key={contact.id}>
+                        <td>{contact.name}</td>
+                        <td>{contact.registration_number}</td>
+                        <td>{contact.phone}</td>
+                        <td>{contact.address}</td>
+                        <td>{contact.zip_code}</td>
+                        <td><Pencil onClick={() => handleOpenUpdateForm(contact.id)} height={24} width={20} className="cursor-pointer"/></td>
+                        <td><Trash2 onClick={() => handleDelete(contact.id)} height={24} width={20} className="cursor-pointer"/></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              }
             </div>
           )}
 

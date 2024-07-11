@@ -8,6 +8,7 @@ table{
 }
 
 td {
+  border-bottom: 2px rgb(219, 219, 219) solid;
   padding: 5px;
 }
 
@@ -22,6 +23,7 @@ tbody tr:nth-child(odd) {
 tbody tr:nth-child(even) {
   background-color: #eee;
 }
+
 th:first-of-type {
   border-top-left-radius: 10px;
 }
