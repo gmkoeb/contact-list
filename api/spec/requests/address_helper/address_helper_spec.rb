@@ -6,7 +6,7 @@ describe 'Address Helper' do
       user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
       token = login(user)
       fake_json = File.read(Rails.root.join('./spec/support/json/addresses.json'))
-      url = 'https://viacep.com.br/ws/PR/curitiba/fern/json/'
+      url = 'https://viacep.com.br/ws/PR/Curitiba/Fern/json/'
       fake_response = double('faraday_response', body: fake_json, status: 200)
       allow(Faraday).to receive(:get).with(url).and_return(fake_response)
 

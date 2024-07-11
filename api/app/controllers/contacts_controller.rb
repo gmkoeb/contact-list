@@ -34,8 +34,8 @@ class ContactsController < ApplicationController
 
   def address_helper
     uf = params[:uf]
-    city = params[:city].parameterize
-    address = params[:address].parameterize
+    city = URI.encode_uri_component(params[:city])
+    address = URI.encode_uri_component(params[:address])
 
     response = Faraday.get("https://viacep.com.br/ws/#{uf}/#{city}/#{address}/json/")
 
