@@ -85,7 +85,7 @@ export default function Home(){
       setSubmitting(false)
       getContacts()
       setContact(null)
-      setCreateFormOpen(false)
+      setUpdateFormOpen(false)
     } catch (error) {
       setApiErrors(error.response.data.message)
       setSubmitting(false)
