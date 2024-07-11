@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import Cookies from 'js-cookie'
 import { checkSession } from "../lib/checkSession"
 import { Link } from "react-router-dom"
-import { Pencil, Trash2, User, UserRoundPlus } from "lucide-react"
+import { HelpCircle, Pencil, Trash2, User, UserRoundPlus } from "lucide-react"
 import { Form, Formik } from "formik";
 import TextInput from "../components/TextInput"
 import { api } from "../../api/axios"
@@ -11,10 +11,13 @@ export default function Home(){
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [createFormOpen, setCreateFormOpen] = useState(false)
   const [updateFormOpen, setUpdateFormOpen] = useState(false)
+  const [helperFormOpen, setHelperFormOpen] = useState(false)
   const [contacts, setContacts] = useState([])
   const [apiErrors, setApiErrors] = useState([])
-  const [contact, setContact] = useState(null)
+  const [suggestions, setSuggestions] = useState([])
   const [filteredContacts, setFilteredContacts] = useState([])
+  const [contact, setContact] = useState(null)
+  const [suggestion, setSuggestion] = useState({address: '', zip_code: ''})
   const [searchQuery, setSearchQuery] = useState('')
 
   async function handleContactCreation(values, { setSubmitting }){
@@ -34,8 +37,10 @@ export default function Home(){
       await api.post('/contacts', contactData)
       setSubmitting(false)
       getContacts()
+      setSuggestion({address: '', zip_code: ''})
       setCreateFormOpen(false)
     } catch (error) {
+      console.log(error)
       setApiErrors(error.response.data.message)
       setSubmitting(false)
     }
@@ -66,6 +71,17 @@ export default function Home(){
     }
   }
   
+  async function handleHelperFormSubmit(values, { setSubmitting }){
+    try {
+      const response = await api.get(`/address_helper/${values.uf}/${values.city}/${values.address}`)
+      setSubmitting(false)
+      setSuggestions(response.data.suggestions)
+    } catch (error) {
+      setApiErrors(error)
+      setSubmitting(false)
+    }
+  }
+
   async function getContacts(){
     const response = await api.get('/contacts')
     setContacts(response.data.contacts)
@@ -83,9 +99,16 @@ export default function Home(){
     setContact(response.data.contact)
   }
 
-  function handleCloseUpdateForm(){
-    setUpdateFormOpen(false)
-    setContact(null)
+  function handleChange(event){
+    const selectedIndex = event.target.value
+    const selectedSuggestion = suggestions[selectedIndex]
+    if (selectedSuggestion) {
+      setSuggestion({
+        address: `${selectedSuggestion.logradouro} - ${selectedSuggestion.bairro}, ${selectedSuggestion.localidade} - ${selectedSuggestion.uf}`,
+        zip_code: selectedSuggestion.cep
+      })
+      setHelperFormOpen(false)
+    }
   }
 
   useEffect(() =>{
@@ -103,6 +126,17 @@ export default function Home(){
       )
     )
   }, [searchQuery, filteredContacts])
+
+  useEffect(() => {
+    setSuggestions([])
+  }, [helperFormOpen])
+  useEffect(() => {
+    setSuggestion({address: '', zip_code: ''})
+  }, [createFormOpen])
+  useEffect(() => {
+    setContact(null)
+  }, [updateFormOpen])
+
   return(
     <>
       {isLoggedIn ? (
@@ -169,8 +203,9 @@ export default function Home(){
           {createFormOpen && (
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
               <Formik
+                enableReinitialize={true}
                 onSubmit={handleContactCreation}
-                initialValues={{ name: "", registration_number: "", phone: "", address: "", zip_code: "", latitude: 0, longitude: 0}}
+                initialValues={{ name: "", registration_number: "", phone: "", address: suggestion.address, zip_code: suggestion.zip_code, latitude: 0, longitude: 0}}
                 validate={(values) => {
                   const errors = {};
                   if (!values.name) {
@@ -204,7 +239,10 @@ export default function Home(){
                 }}>
                   {({ isSubmitting }) => (
                     <Form className="flex flex-col w-1/2 border border-gray-800 bg-white rounded-md items-center py-10 text-left gap-3">
-                      <h1 className='text-center text-2xl mb-4'>Add contact</h1>
+                      <div className="flex items-center gap-3 mb-4">
+                        <h1 className='text-2xl'>Add contact</h1>
+                        <HelpCircle onClick={() => setHelperFormOpen(true)} className="cursor-pointer" height={28} width={28} />
+                      </div>
                       <div className="flex flex-wrap gap-5 justify-center">
                         <TextInput label="Name" name="name" type="name" placeholder="Contact name" />
                         <TextInput label="Registration Number" name="registration_number" type="registration_number" placeholder="Contact registration number" />
@@ -274,8 +312,68 @@ export default function Home(){
                         <TextInput label="Longitude" name="longitude" type="longitude" placeholder="Contact longitude" />
                       </div>
                       <button className="mt-6 bg-purple-600 text-white rounded-lg py-1 font-semibold hover:bg-opacity-75 hover:duration-300 w-72" type="submit" disabled={isSubmitting}>Update</button>
-                      <button onClick={() => handleCloseUpdateForm()} className="bg-red-600 w-40 text-white rounded-lg py-1 hover:bg-opacity-75 hover:duration-300">Cancel</button>
+                      <button onClick={() =>setUpdateFormOpen(false)} className="bg-red-600 w-40 text-white rounded-lg py-1 hover:bg-opacity-75 hover:duration-300">Cancel</button>
                       <p className="text-red-600 text-lg mt-4">{apiErrors}</p>
+                    </Form>
+                )}
+              </Formik>
+            </div>
+          )}
+
+          {helperFormOpen && (
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+              <Formik
+                onSubmit={handleHelperFormSubmit}
+                initialValues={{ uf: "", city: "", address: ""}}
+                validate={(values) => {
+                  const errors = {};
+                  if (!values.uf) {
+                    errors.uf = "Required"
+                  } else if (values.uf.length > 2 || values.uf.length < 2){
+                    errors.uf = "Invalid UF"
+                  }
+
+                  if (!values.city) {
+                    errors.city = 'Required';
+                  } 
+
+                  if(!values.address){
+                    errors.address = 'Required'
+                  }
+                  return errors
+                }}>
+                  {({ isSubmitting }) => (
+                    <Form className="flex flex-col w-1/2 border border-gray-800 bg-white rounded-md items-center py-10 text-left gap-3">
+                      <div className="flex flex-col items-center gap-3 mb-4">
+                        <h1 className='text-2xl'>Helper Form for Address Completion</h1>
+                      </div>
+                      <div className="flex flex-wrap gap-5 justify-center">
+                        <TextInput label="UF" name="uf" type="uf" placeholder="State acronym" />
+                        <TextInput label="City" name="city" type="city" placeholder="City" />
+                        <TextInput label="Address" name="address" type="address" placeholder="Part of address (street)" />
+                      </div>
+                      <button className="mt-6 bg-purple-600 text-white rounded-lg py-1 font-semibold hover:bg-opacity-75 hover:duration-300 w-72" type="submit" disabled={isSubmitting}>Submit</button>
+                      <button onClick={() => setHelperFormOpen(false)} className="bg-red-600 w-40 text-white rounded-lg py-1 hover:bg-opacity-75 hover:duration-300">Cancel</button>
+                      <p className="text-red-600 text-lg mt-4">{apiErrors}</p>
+                      {suggestions && suggestions.length > 0 && (
+                        <>
+                          <h2 className="text-center font-semibold text-lg">Suggestions</h2>
+                          <select
+                            className="w-96 bg-slate-100 rounded-lg p-1"
+                            name="suggestions"
+                            id="suggestions"
+                            onChange={event => handleChange(event)}
+                          >
+                            <option value="">Select an address</option>
+                            {suggestions.map((suggestion, index) => (
+                              <option key={index} 
+                                      value={index}>
+                                {suggestion.logradouro}, {suggestion.bairro}. {suggestion.cep}
+                              </option>
+                            ))}
+                          </select>
+                        </>
+                      )}
                     </Form>
                 )}
               </Formik>

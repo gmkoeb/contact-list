@@ -1,0 +1,29 @@
+[
+  {
+    "cep": "80050-432",
+    "logradouro": "Rua Fernando Amaro",
+    "complemento": "de 1441/1442 ao fim",
+    "unidade": "",
+    "bairro": "Cristo Rei",
+    "localidade": "Curitiba",
+    "uf": "PR",
+    "ibge": "4106902",
+    "gia": "",
+    "ddd": "41",
+    "siafi": "7535"
+  },
+  {
+    "cep": "82650-000",
+    "logradouro": "Rua Fernando de Noronha",
+    "complemento": "de 1941/1942 ao fim",
+    "unidade": "",
+    "bairro": "Santa Cândida",
+    "localidade": "Curitiba",
+    "uf": "PR",
+    "ibge": "4106902",
+    "gia": "",
+    "ddd": "41",
+    "siafi": "7535"
+  }
+]
+  

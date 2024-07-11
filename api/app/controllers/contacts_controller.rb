@@ -32,6 +32,20 @@ class ContactsController < ApplicationController
     render status: :ok, json: { message: 'Contact deleted with success.' }
   end
 
+  def address_helper
+    uf = params[:uf]
+    city = params[:city].parameterize
+    address = params[:address].parameterize
+
+    response = Faraday.get("https://viacep.com.br/ws/#{uf}/#{city}/#{address}/json/")
+
+    if response.status == 200
+      render status: :ok, json: { suggestions: JSON.parse(response.body) }
+    else
+      render status: :unprocessable_content, json: { message: "Invalid address" }
+    end
+  end
+
   private
 
   def contact_params

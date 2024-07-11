@@ -35,6 +35,8 @@ gem 'devise'
 
 gem 'devise-jwt'
 
+gem 'faraday'
+
 gem 'jsonapi-serializer'
 
 gem 'rack-cors'
