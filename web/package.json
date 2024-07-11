@@ -16,6 +16,7 @@
     "axios": "^1.7.2",
     "formik": "^2.4.6",
     "lucide-react": "^0.394.0",
+    "react-tooltip": "^5.27.0",
     "js-cookie": "^3.0.5"
   },
   "devDependencies": {

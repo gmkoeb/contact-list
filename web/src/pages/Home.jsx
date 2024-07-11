@@ -6,6 +6,7 @@ import { HelpCircle, Pencil, Trash2, User, UserRoundPlus } from "lucide-react"
 import { Form, Formik } from "formik";
 import TextInput from "../components/TextInput"
 import { api } from "../../api/axios"
+import { Tooltip } from 'react-tooltip'
 
 export default function Home(){
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -241,7 +242,8 @@ export default function Home(){
                     <Form className="flex flex-col w-1/2 border border-gray-800 bg-white rounded-md items-center py-10 text-left gap-3">
                       <div className="flex items-center gap-3 mb-4">
                         <h1 className='text-2xl'>Add contact</h1>
-                        <HelpCircle onClick={() => setHelperFormOpen(true)} className="cursor-pointer" height={28} width={28} />
+                        <HelpCircle data-tooltip-id="helper" data-tooltip-content="Auto fill helper" onClick={() => setHelperFormOpen(true)} className="cursor-pointer" height={28} width={28} />
+                        <Tooltip id="helper" />
                       </div>
                       <div className="flex flex-wrap gap-5 justify-center">
                         <TextInput label="Name" name="name" type="name" placeholder="Contact name" />
