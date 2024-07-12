@@ -3,7 +3,7 @@ class ContactsController < ApplicationController
   before_action :check_user, only: %w[update destroy show]
 
   def index
-    render status: :ok, json: { contacts: @current_user.contacts }
+    render status: :ok, json: { contacts: @current_user.contacts.order(:name) }
   end
 
   def show
