@@ -3,6 +3,7 @@
 ## Content Table
 - [Instalation and Execution](#instalation-and-execution)
 - [Tests](#tests)
+- [API Documentation](#api-documentation)
 
 ## Instalation and Execution
 To execute the application you must:
@@ -66,3 +67,10 @@ To run the tests you must:
 2. Inside the API folder, run:
 
        rspec
+
+## API Documentation
+To see the documentation you have to:
+
+1. After following the steps 1-9 in section 1, go to:
+
+        http://localhost:3000/api-docs
