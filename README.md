@@ -8,7 +8,7 @@
 - [Configuring Google Maps Api Key](#configuring-google-maps-api-key)
 ## Requirements
 To run this project locally, ensure you have the following installed:
-1. Ruby (Version 3.3.0)
+1. Ruby (Version 3.2.2)
 
 2. Nodejs
 
