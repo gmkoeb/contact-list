@@ -40,6 +40,18 @@ export default function Home(){
   const [suggestion, setSuggestion] = useState({address: '', zip_code: ''})
   const [searchQuery, setSearchQuery] = useState('')
 
+  const [currentPage, setCurrentPage] = useState(1)
+  const contactsPerPage = 5
+  const pageNumbers = []
+  const indexOfLastContact = currentPage * contactsPerPage;
+  const indexOfFirstContact = indexOfLastContact - contactsPerPage;
+  const currentContacts = contacts.slice(indexOfFirstContact, indexOfLastContact)
+
+  for (let i = 1; i <= Math.ceil(contacts.length / contactsPerPage); i++) {
+    pageNumbers.push(i)
+  }
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
   async function handleContactCreation(values, { setSubmitting }){
     const contactData = {
       contact: {
@@ -210,7 +222,7 @@ export default function Home(){
                     </tr>
                   </thead>
                   <tbody>
-                    {contacts.map(contact => (
+                    {currentContacts.map(contact => (
                       <tr onClick={() => handleContactClick(contact.id)} className="cursor-pointer" key={contact.id}>
                         <td>{contact.name}</td>
                         <td>{contact.registration_number}</td>
@@ -222,6 +234,24 @@ export default function Home(){
                       </tr>
                     ))}
                   </tbody>
+                  <td colSpan="7" className="border bg-gray-200">
+                    <div className="flex justify-center my-4">
+                      <nav>
+                        <ul className="flex list-none">
+                          {pageNumbers.map(number => (
+                            <li key={number} className={`mx-1 rounded ${currentPage === number ? 'font-bold bg-gray-300' : ''}`}>
+                              <button
+                                onClick={() => paginate(number)}
+                                className="px-3 py-2 rounded duration-300 hover:bg-gray-300"
+                              >
+                                {number}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </nav>
+                    </div>
+                  </td>
                 </table>
               }
                 <div className="fixed right-[11%] top-[26%]">
@@ -381,7 +411,7 @@ export default function Home(){
                   return errors
                 }}>
                   {({ isSubmitting }) => (
-                    <Form className="flex flex-col w-1/2 border border-gray-800 bg-white rounded-md items-center py-10 text-left gap-3">
+                    <Form className="flex flex-col w-[30rem] border border-gray-800 bg-white rounded-md items-center py-5 text-left gap-3">
                       <div className="flex flex-col items-center gap-3 mb-4">
                         <h1 className='text-2xl'>Helper Form for Address Completion</h1>
                       </div>
@@ -390,9 +420,6 @@ export default function Home(){
                         <TextInput label="City" name="city" type="city" placeholder="City" />
                         <TextInput label="Address" name="address" type="address" placeholder="Part of address (street)" />
                       </div>
-                      <button className="mt-6 bg-purple-600 text-white rounded-lg py-1 font-semibold hover:bg-opacity-75 hover:duration-300 w-72" type="submit" disabled={isSubmitting}>Submit</button>
-                      <button onClick={() => setHelperFormOpen(false)} className="bg-red-600 w-40 text-white rounded-lg py-1 hover:bg-opacity-75 hover:duration-300">Cancel</button>
-                      <p className="text-red-600 text-lg mt-4">{apiErrors}</p>
                       {suggestions && suggestions.length > 0 && (
                         <>
                           <h2 className="text-center font-semibold text-lg">Suggestions</h2>
@@ -412,6 +439,9 @@ export default function Home(){
                           </select>
                         </>
                       )}
+                      <button className="mt-6 bg-purple-600 text-white rounded-lg py-1 font-semibold hover:bg-opacity-75 hover:duration-300 w-72" type="submit" disabled={isSubmitting}>Submit</button>
+                      <button onClick={() => setHelperFormOpen(false)} className="bg-red-600 w-40 text-white rounded-lg py-1 hover:bg-opacity-75 hover:duration-300">Cancel</button>
+                      <p className="text-red-600 text-lg mt-4">{apiErrors}</p>
                     </Form>
                 )}
               </Formik>
