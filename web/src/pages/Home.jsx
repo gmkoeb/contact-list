@@ -8,6 +8,7 @@ import TextInput from "../components/TextInput"
 import { api } from "../../api/axios"
 import { Tooltip } from 'react-tooltip'
 import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
+import { validateCPF } from "../lib/validateCPF"
 
 const mapContainerStyle = {
   width: '25vw',
@@ -68,6 +69,7 @@ export default function Home(){
     try {
       await api.post('/contacts', contactData)
       setSubmitting(false)
+      setApiErrors([])
       getContacts()
       setSuggestion({address: '', zip_code: ''})
       setCreateFormOpen(false)
@@ -98,6 +100,7 @@ export default function Home(){
       setContact(null)
       setUpdateFormOpen(false)
     } catch (error) {
+      console.log(error)
       setApiErrors(error.response.data.message)
       setSubmitting(false)
     }
@@ -170,6 +173,7 @@ export default function Home(){
 
   useEffect(() => {
     setSuggestion({address: '', zip_code: ''})
+    setApiErrors([])
   }, [createFormOpen])
 
   useEffect(() => {
@@ -289,7 +293,9 @@ export default function Home(){
 
                   if (!values.registration_number) {
                     errors.registration_number = 'Required';
-                  } 
+                  } else if (!validateCPF(values.registration_number)){
+                    errors.registration_number = 'Invalid registration number';
+                  }
 
                   if(!values.phone){
                     errors.phone = 'Required'
@@ -352,7 +358,9 @@ export default function Home(){
 
                   if (!values.registration_number) {
                     errors.registration_number = 'Required';
-                  } 
+                  } else if (!validateCPF(values.registration_number)){
+                    errors.registration_number = 'Invalid registration number';
+                  }
 
                   if(!values.phone){
                     errors.phone = 'Required'
@@ -377,7 +385,7 @@ export default function Home(){
                 }}>
                   {({ isSubmitting }) => (
                     <Form className="flex flex-col w-1/2 border border-gray-800 bg-white rounded-md items-center py-10 text-left gap-3">
-                      <h1 className='text-center text-2xl mb-4'>Add contact</h1>
+                      <h1 className='text-center text-2xl mb-4'>Edit contact</h1>
                       <div className="flex flex-wrap gap-5 justify-center">
                         <TextInput label="Name" name="name" type="name" placeholder="Contact name" />
                         <TextInput label="Registration Number" name="registration_number" type="registration_number" placeholder="Contact registration number" />

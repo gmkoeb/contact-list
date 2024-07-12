@@ -165,6 +165,22 @@ describe 'Contact API' do
       expect(json_response['message']).to eq 'Contact updated with success.'
     end
 
+    it 'doenst update contact with wrong parameters' do
+      user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
+
+      user.contacts.create(name: 'Contact 1', registration_number: '30830071083', phone: '123456',
+                           address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
+
+      token = login(user)
+      patch contact_path(1), headers: { Authorization: token }, params: { contact: { name: '', registration_number: '308300' } }
+      json_response = JSON.parse(response.body)
+
+      expect(response.status).to eq 422
+      expect(user.contacts.last.name).to eq 'Contact 1'
+      expect(json_response['message']).to include "Name can't be blank"
+      expect(json_response['message']).to include 'Registration number not valid'
+    end
+
     it 'a user cannot update another user contact' do
       user = User.create(name: 'Test', email: 'test@email.com', password: '123456')
       second_user = User.create(name: 'Test 2', email: 'test2@email.com', password: '123456')

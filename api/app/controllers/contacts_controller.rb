@@ -24,10 +24,11 @@ class ContactsController < ApplicationController
   end
 
   def update
-    if contact.update(contact_params)
+    @contact = contact
+    if @contact.update(contact_params)
       render status: :ok, json: { message: 'Contact updated with success.' }
     else
-      render status: :unprocessable_content, json: { message: contact.errors.full_messages }
+      render status: :unprocessable_content, json: { message: @contact.errors.full_messages }
     end
   end
 
