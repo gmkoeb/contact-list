@@ -327,15 +327,20 @@ export default function Home(){
                     <Form className="flex flex-col w-1/2 border border-gray-800 bg-white rounded-md items-center py-10 text-left gap-3">
                       <div className="flex items-center gap-3 mb-4">
                         <h1 className='text-2xl'>Add contact</h1>
-                        <HelpCircle data-tooltip-id="helper" data-tooltip-content="Auto fill helper" onClick={() => setHelperFormOpen(true)} className="cursor-pointer" height={28} width={28} />
-                        <Tooltip id="helper" />
+                       
                       </div>
                       <div className="flex flex-wrap gap-5 justify-center">
                         <TextInput label="Name" name="name" type="name" placeholder="Contact name" />
                         <TextInput label="Registration Number" name="registration_number" type="registration_number" placeholder="Contact registration number" />
                         <TextInput label="Phone" name="phone" type="phone" placeholder="Contact phone" />
                         <TextInput label="Address" name="address" type="address" placeholder="Contact address" />
-                        <TextInput label="Zip code" name="zip_code" type="zip_code" placeholder="Contact zip code" />
+                        <TextInput label={ 
+                          <div className="flex gap-1 items-center">
+                            <p>Zip Code</p>
+                            <HelpCircle data-tooltip-id="helper" data-tooltip-content="Auto fill helper" onClick={() => setHelperFormOpen(true)} className="cursor-pointer" height={24} width={24} />
+                            <Tooltip id="helper" /> 
+                          </div>
+                        } name="zip_code" type="zip_code" placeholder="Contact zip code" />
                         <TextInput label="Latitude" name="latitude" type="latitude" placeholder="Contact latitude" />
                         <TextInput label="Longitude" name="longitude" type="longitude" placeholder="Contact longitude" />
                       </div>
