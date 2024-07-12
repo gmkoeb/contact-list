@@ -9,7 +9,6 @@ import { api } from "../../api/axios"
 import { Tooltip } from 'react-tooltip'
 import { GoogleMap, MarkerF, useLoadScript } from "@react-google-maps/api";
 
-
 const mapContainerStyle = {
   width: '25vw',
   height: '50vh',

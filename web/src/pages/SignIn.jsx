@@ -2,10 +2,12 @@ import { Form, Formik } from "formik";
 import TextInput from "../components/TextInput";
 import { api } from "../../api/axios";
 import Cookies from 'js-cookie'
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 
 export default function SignIn(){
+  const location = useLocation();
+  const message = location.state?.message;
   const navigate = useNavigate()
   const [error, setError] = useState('')
 
@@ -33,6 +35,7 @@ export default function SignIn(){
 
   return (
     <>
+      {message && <p className="text-center text-lg">{message}</p>}
       <Formik
       onSubmit={handleSubmit}
       initialValues={{ email: "", password: "" }}

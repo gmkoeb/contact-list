@@ -11,8 +11,9 @@ Rails.application.routes.draw do
     registrations: 'users/registrations'
   }
 
+  resources :contacts
+
+  delete 'account', to: 'accounts#destroy', as: :destroy_account
   get 'check_session', to: 'check_session#check'
   get 'address_helper/:uf/:city/:address', to: 'contacts#address_helper'
-
-  resources :contacts
 end

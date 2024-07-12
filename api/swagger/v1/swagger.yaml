@@ -4,6 +4,53 @@ info:
   title: API V1
   version: v1
 paths:
+  "/account":
+    delete:
+      summary: Deletes user account
+      tags:
+      - Account
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: user deleted
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    password:
+                      type: string
+                  required:
+                  - password
+              required:
+              - user
+  "/check_session":
+    get:
+      summary: Checks user session
+      tags:
+      - Check Session
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: valid session
+        '401':
+          description: invalid session
   "/contacts":
     post:
       summary: Creates a contact

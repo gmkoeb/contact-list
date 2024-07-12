@@ -3,6 +3,7 @@ import { checkSession } from "../lib/checkSession";
 import { useState, useEffect } from "react";
 import Cookies from 'js-cookie'
 import { api } from "../../api/axios";
+import { Link } from "react-router-dom";
 
 export default function Header(){
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -28,7 +29,8 @@ export default function Header(){
         </div>
         { isLoggedIn ? (
           <div className="flex items-center gap-4">
-            <div>
+            <div className="flex items-center gap-4">
+              <Link to={'/profile'} className="font-semibold hover:opacity-70 duration-300">My Profile</Link>
               <h5 className="font-semibold text-purple-600 text-md">{Cookies.get('user')}</h5>
             </div>
             <button onClick={handleLogout} className="px-4 py-1 rounded-lg mr-3 text-white bg-red-600 hover:duration-300">Sign Out</button>
