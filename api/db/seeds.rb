@@ -15,3 +15,5 @@ user = User.create(name: 'User', email: 'user@email.com', password: '123456')
     longitude: Faker::Address.longitude,
   )
 end
+
+pp "Database seed finished. Login with email: #{user.email}, password: #{user.password}"
