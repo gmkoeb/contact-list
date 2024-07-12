@@ -18,7 +18,7 @@ paths:
           type: string
       responses:
         '201':
-          description: blog created
+          description: contact created
         '422':
           description: invalid request
       requestBody:
@@ -46,15 +46,35 @@ paths:
               - registration_number
               - address
               - zip_code
+              - phone
               - latitude
               - longitude
-  "/blogs/{id}":
     get:
-      summary: Retrieves a blog
+      summary: Retrieves contact list
       tags:
-      - Blogs
-      - Another Tag
+      - Contacts
+      security:
+      - Bearer: {}
       parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: retrieves contacts list
+  "/contacts/{id}":
+    get:
+      summary: Retrieves a contact
+      tags:
+      - Contacts
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
       - name: id
         in: path
         required: true
@@ -62,40 +82,227 @@ paths:
           type: string
       responses:
         '200':
-          description: blog found
+          description: contact found
+        '404':
+          description: contact not found
+    patch:
+      summary: Updates a contact
+      tags:
+      - Contacts
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: contact updated with success
+        '422':
+          description: invalid parameters
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                registration_number:
+                  type: string
+                phone:
+                  type: string
+                address:
+                  type: string
+                zip_code:
+                  type: string
+                latitude:
+                  type: integer
+                longitude:
+                  type: integer
+              required:
+              - name
+              - registration_number
+              - address
+              - zip_code
+              - phone
+              - latitude
+              - longitude
+    delete:
+      summary: Deletes a contact
+      tags:
+      - Contacts
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: contact deleted with success
+        '404':
+          description: contact not found
+  "/address_helper/{uf}/{city}/{address}":
+    get:
+      summary: Retrieves address information
+      tags:
+      - Address Helper
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      - name: uf
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: city
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: address
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: address found
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                  title:
-                    type: string
-                  content:
-                    type: string
+                  suggestions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        cep:
+                          type: string
+                        logradouro:
+                          type: string
+                        complemento:
+                          type: string
+                        bairro:
+                          type: string
+                        localidade:
+                          type: string
+                        uf:
+                          type: string
+                        ibge:
+                          type: string
+                        gia:
+                          type: string
+                        ddd:
+                          type: string
+                        siafi:
+                          type: string
+                      required:
+                      - cep
+                      - logradouro
+                      - bairro
+                      - localidade
+                      - uf
                 required:
-                - id
-                - title
-                - content
-            application/xml:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                  title:
-                    type: string
-                  content:
-                    type: string
-                required:
-                - id
-                - title
-                - content
-        '404':
-          description: blog not found
-        '406':
-          description: unsupported accept header
+                - suggestions
+  "/login":
+    post:
+      summary: Authenticates a user
+      tags:
+      - Users
+      parameters: []
+      responses:
+        '200':
+          description: user authenticated
+        '401':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                    password:
+                      type: string
+                  required:
+                  - email
+                  - password
+              required:
+              - user
+  "/signup":
+    post:
+      summary: Creates a user
+      tags:
+      - Users
+      parameters: []
+      responses:
+        '200':
+          description: user created
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    email:
+                      type: string
+                    password:
+                      type: string
+                  required:
+                  - name
+                  - email
+                  - password
+              required:
+              - user
+  "/logout":
+    delete:
+      summary: Signs out a user
+      tags:
+      - Users
+      security:
+      - Bearer: {}
+      parameters:
+      - name: Authorization
+        in: header
+        schema:
+          type: string
+      responses:
+        '200':
+          description: user signed out with success
 components:
   securitySchemes:
     Bearer:

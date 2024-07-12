@@ -7,13 +7,17 @@ class ContactsController < ApplicationController
   end
 
   def show
-    render status: :ok, json: { contact: }
+    if contact
+      render status: :ok, json: { contact: }
+    else
+      render status: :not_found, json: { message: 'Contact not found' }
+    end
   end
 
   def create
     contact = @current_user.contacts.build(contact_params)
     if contact.save
-      render status: :ok, json: { message: 'Contact created with success!' }
+      render status: :created, json: { message: 'Contact created with success!' }
     else
       render status: :unprocessable_content, json: { message: contact.errors.full_messages }
     end
@@ -42,7 +46,7 @@ class ContactsController < ApplicationController
     if response.status == 200
       render status: :ok, json: { suggestions: JSON.parse(response.body) }
     else
-      render status: :unprocessable_content, json: { message: "Invalid address" }
+      render status: :unprocessable_content, json: { message: 'Invalid address' }
     end
   end
 

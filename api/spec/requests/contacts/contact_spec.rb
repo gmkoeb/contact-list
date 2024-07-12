@@ -14,7 +14,7 @@ describe 'Contact API' do
       contact = Contact.last
       json_response = JSON.parse(response.body)
 
-      expect(response.status).to eq 200
+      expect(response.status).to eq 201
       expect(json_response['message']).to eq 'Contact created with success!'
       expect(contact.user).to eq user
       expect(contact.name).to eq 'Test'

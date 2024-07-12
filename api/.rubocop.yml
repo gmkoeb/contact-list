@@ -11,6 +11,8 @@ AllCops:
     - 'config/**/*'
     - 'script/**/*'
     - 'spec/rails_helper.rb'
+    - 'spec/requests/swagger/*'
+    - 'spec/swagger_helper.rb'
   SuggestExtensions: false
 
 Style/Documentation:
@@ -21,7 +23,7 @@ Style/FrozenStringLiteralComment:
 
 Metrics/BlockLength:
   AllowedMethods: ['describe', 'context', 'feature', 'scenario', 'let', 'it']
-
+    
 Metrics/AbcSize:
   Exclude:
   - 'app/controllers/users/*'
@@ -29,3 +31,4 @@ Metrics/AbcSize:
 Metrics/MethodLength:
   Exclude:
   - 'app/controllers/application_controller.rb'
+  
