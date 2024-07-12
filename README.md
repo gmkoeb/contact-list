@@ -4,7 +4,7 @@
 - [Instalation and Execution](#instalation-and-execution)
 - [Tests](#tests)
 - [API Documentation](#api-documentation)
-
+- [Configuring Google Maps Api Key](#configuring-google-maps-api-key)
 ## Instalation and Execution
 To execute the application you must:
 1. Clone the repository
@@ -74,3 +74,12 @@ To see the documentation you have to:
 1. After following the steps 1-9 in section 1, go to:
 
         http://localhost:3000/api-docs
+
+## Configuring Google Maps Api Key
+To correctly load the google maps api, you'll have to: 
+
+1. Create a .env at the root of the web folder.
+
+2. Create a variable:
+
+        VITE_GOOGLE_API_KEY="YOUR API KEY"
