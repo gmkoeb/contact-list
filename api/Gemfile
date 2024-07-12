@@ -35,6 +35,8 @@ gem 'devise'
 
 gem 'devise-jwt'
 
+gem 'faker'
+
 gem 'faraday'
 
 gem 'jsonapi-serializer'

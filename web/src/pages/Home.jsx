@@ -179,7 +179,7 @@ export default function Home(){
   return(
     <>
       {isLoggedIn ? (
-        <div className="relative">
+        <div>
           {contacts.length === 0 && !searchQuery ? (
             <div className="text-center flex flex-col items-center">
               <h2 className="text-xl">Your contact list is empty</h2>
@@ -188,82 +188,88 @@ export default function Home(){
                 Add a contact<UserRoundPlus width={20} height={24}/>
               </button>
             </div>
-          ): (
-            <div className="w-[85%]">
-              <div className="flex flex-col justify-center items-center">
-                <h2 className="text-3xl text-left w-1/2 font-bold text-gray-500">Contacts</h2>
-              </div>
-              <div className="w-1/2 mx-auto flex items-center mt-4">
-                <button
-                  onClick={() => setCreateFormOpen(true)}
-                  className="flex gap-2 text-lg items-center bg-purple-600 text-white rounded-lg px-4 py-1 mr-4 hover:opacity-80 duration-200 border border-gray-600"
-                >
-                  Add <UserRoundPlus width={20} height={24} />
-                </button>
-                <div className="flex flex-col">
-                  <label className="hidden" htmlFor='contactSearch'>Search</label>
-                  <input className="py-1 pl-2 w-64 border-2 rounded-lg" type="text" placeholder="Search for a contact" onChange={(event) => setSearchQuery(event.target.value)} />
-                </div>
-              </div>
-                {searchQuery &&
-                  <p className="text-center">Found {contacts.length} {contacts.length === 1 ? 'result' : 'results'} for: "{searchQuery}"</p>
-                }
+          ) : (
+            <div>
               {contacts.length > 0 &&
-                <table className="w-1/2 mx-auto mt-4">
-                  <thead className="rounded-t-3xl bg-gray-200">
-                    <tr className="text-gray-600">
-                      <th className="py-2">Name</th>
-                      <th>Registration Number</th>
-                      <th>Phone</th>
-                      <th>Address</th>
-                      <th>Zip Code</th>
-                      <th></th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentContacts.map(contact => (
-                      <tr onClick={() => handleContactClick(contact.id)} className="cursor-pointer" key={contact.id}>
-                        <td>{contact.name}</td>
-                        <td>{contact.registration_number}</td>
-                        <td>{contact.phone}</td>
-                        <td>{contact.address}</td>
-                        <td>{contact.zip_code}</td>
-                        <td><Pencil onClick={() => handleOpenUpdateForm(contact.id)} height={24} width={20} className="cursor-pointer"/></td>
-                        <td><Trash2 onClick={() => handleDelete(contact.id)} height={24} width={20} className="cursor-pointer"/></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <td colSpan="7" className="border bg-gray-200">
-                    <div className="flex justify-center my-4">
-                      <nav>
-                        <ul className="flex list-none">
-                          {pageNumbers.map(number => (
-                            <li key={number} className={`mx-1 rounded ${currentPage === number ? 'font-bold bg-gray-300' : ''}`}>
-                              <button
-                                onClick={() => paginate(number)}
-                                className="px-3 py-2 rounded duration-300 hover:bg-gray-300"
-                              >
-                                {number}
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      </nav>
+              <>
+                <div className="relative flex flex-col items-start mx-auto w-[75%]">
+                  <h2 className="text-3xl w-full text-left font-bold text-gray-500">Contacts</h2>
+                  <div className="flex w-full items-center mt-4">
+                    <button
+                      onClick={() => setCreateFormOpen(true)}
+                      className="flex gap-2 text-lg items-center bg-purple-600 text-white rounded-lg px-4 py-1 mr-4 hover:opacity-80 duration-200 border border-gray-600"
+                    >
+                      Add <UserRoundPlus width={20} height={24} />
+                    </button>
+                    <div className="flex flex-col">
+                      <label className="hidden" htmlFor='contactSearch'>Search</label>
+                      <input className="py-1 pl-2 w-64 border-2 rounded-lg" type="text" placeholder="Search for a contact" onChange={(event) => setSearchQuery(event.target.value)} />
                     </div>
-                  </td>
-                </table>
-              }
-                <div className="fixed right-[11%] top-[26%]">
-                  <GoogleMap
-                    id="map"
-                    mapContainerStyle={mapContainerStyle}
-                    zoom={10}
-                    center={center}
-                  >
-                    <MarkerF position={{lat: contact?.latitude, lng: contact?.longitude}} />
-                  </GoogleMap>
                 </div>
+                  {searchQuery &&
+                    <p>Found {contacts.length} {contacts.length === 1 ? 'result' : 'results'} for: "{searchQuery}"</p>
+                  }
+                </div>
+                <div className="flex mt-4 justify-center">
+                  <table className="w-1/2 h-[50vh]">
+                    <thead className="rounded-t-3xl bg-gray-200">
+                      <tr className="text-gray-600">
+                        <th className="py-2">Name</th>
+                        <th>Registration Number</th>
+                        <th>Phone</th>
+                        <th>Address</th>
+                        <th>Zip Code</th>
+                        <th></th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {currentContacts.map(contact => (
+                        <tr onClick={() => handleContactClick(contact.id)} className="cursor-pointer" key={contact.id}>
+                          <td>{contact.name}</td>
+                          <td>{contact.registration_number}</td>
+                          <td>{contact.phone}</td>
+                          <td>{contact.address}</td>
+                          <td>{contact.zip_code}</td>
+                          <td><Pencil onClick={() => handleOpenUpdateForm(contact.id)} height={24} width={20} className="cursor-pointer"/></td>
+                          <td><Trash2 onClick={() => handleDelete(contact.id)} height={24} width={20} className="cursor-pointer"/></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <td colSpan="7" className="border bg-gray-200 align-middle">
+                      <div className="flex justify-center">
+                        <nav>
+                          <ul className="flex list-none">
+                            {pageNumbers.map(number => (
+                              <li key={number} className={`mx-1 rounded ${currentPage === number ? 'font-bold bg-gray-300' : ''}`}>
+                                <button
+                                  onClick={() => paginate(number)}
+                                  className="px-3 py-2 rounded duration-300 hover:bg-gray-300"
+                                >
+                                  {number}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </nav>
+                      </div>
+                    </td>
+                  </table>
+                  <div>
+                    <div>
+                      <GoogleMap
+                        id="map"
+                        mapContainerStyle={mapContainerStyle}
+                        zoom={10}
+                        center={center}
+                      >
+                        <MarkerF position={{lat: contact?.latitude, lng: contact?.longitude}} />
+                      </GoogleMap>
+                    </div>
+                  </div>
+                </div>
+              </>
+              }
             </div>
           )}
 
