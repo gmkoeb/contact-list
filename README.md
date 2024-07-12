@@ -1,10 +1,19 @@
 # Contact List
 
 ## Content Table
+- [Requirements](#requirements)
 - [Instalation and Execution](#instalation-and-execution)
 - [Tests](#tests)
 - [API Documentation](#api-documentation)
 - [Configuring Google Maps Api Key](#configuring-google-maps-api-key)
+## Requirements
+To run this project locally, ensure you have the following installed:
+1. Ruby (Version 3.3.0)
+
+2. Nodejs
+
+3. SQLite
+
 ## Instalation and Execution
 To execute the application you must:
 1. Clone the repository
