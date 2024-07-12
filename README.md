@@ -37,7 +37,7 @@ Save and close the file
 
 8. Inside the api folder run:
 
-        rails db:create db:migrate
+        rails db:create db:migrate db:seed
 
 9. Finally you can start the API server by running
 
