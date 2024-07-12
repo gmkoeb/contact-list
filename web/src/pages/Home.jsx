@@ -35,11 +35,12 @@ export default function Home(){
   const [helperFormOpen, setHelperFormOpen] = useState(false)
   const [contacts, setContacts] = useState([])
   const [apiErrors, setApiErrors] = useState([])
-  const [suggestions, setSuggestions] = useState([])
+  const [suggestions, setSuggestions] = useState(null)
   const [filteredContacts, setFilteredContacts] = useState([])
   const [contact, setContact] = useState(null)
   const [suggestion, setSuggestion] = useState({address: '', zip_code: ''})
   const [searchQuery, setSearchQuery] = useState('')
+  const [suggestionsNotFound, setSuggestionsNotFound] = useState('')
 
   const [currentPage, setCurrentPage] = useState(1)
   const contactsPerPage = 5
@@ -110,6 +111,9 @@ export default function Home(){
     try {
       const response = await api.get(`/address_helper/${values.uf}/${values.city}/${values.address}`)
       setSubmitting(false)
+      if (response.data.suggestions.length === 0) {
+        setSuggestionsNotFound("Couldn't find any address with the specified information.")
+      }
       setSuggestions(response.data.suggestions)
     } catch (error) {
       setApiErrors(error)
@@ -169,6 +173,7 @@ export default function Home(){
 
   useEffect(() => {
     setSuggestions([])
+    setSuggestionsNotFound('')
   }, [helperFormOpen])
 
   useEffect(() => {
@@ -423,6 +428,8 @@ export default function Home(){
 
                   if(!values.address){
                     errors.address = 'Required'
+                  } else if (values.address.length < 3){
+                    errors.address = 'Must have at least 3 digits'
                   }
                   return errors
                 }}>
@@ -436,7 +443,7 @@ export default function Home(){
                         <TextInput label="City" name="city" type="city" placeholder="City" />
                         <TextInput label="Address" name="address" type="address" placeholder="Part of address (street)" />
                       </div>
-                      {suggestions && suggestions.length > 0 && (
+                      {suggestions.length > 0 ? (
                         <>
                           <h2 className="text-center font-semibold text-lg">Suggestions</h2>
                           <select
@@ -453,6 +460,10 @@ export default function Home(){
                               </option>
                             ))}
                           </select>
+                        </>
+                      ) : (
+                        <>
+                          <p>{suggestionsNotFound}</p>
                         </>
                       )}
                       <button className="mt-6 bg-purple-600 text-white rounded-lg py-1 font-semibold hover:bg-opacity-75 hover:duration-300 w-72" type="submit" disabled={isSubmitting}>Submit</button>
