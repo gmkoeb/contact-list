@@ -172,7 +172,8 @@ describe 'Contact API' do
                            address: 'Test street, 155', zip_code: '123456', latitude: 123, longitude: 123)
 
       token = login(user)
-      patch contact_path(1), headers: { Authorization: token }, params: { contact: { name: '', registration_number: '308300' } }
+      patch contact_path(1), headers: { Authorization: token },
+                             params: { contact: { name: '', registration_number: '308300' } }
       json_response = JSON.parse(response.body)
 
       expect(response.status).to eq 422
